@@ -6,7 +6,7 @@
 </head>
 <body>
 
-<!-- v0.0.4-p0 16-Jul-2019 -->
+<!-- v0.0.5-p0 08-Sep-2019 -->
 
 <style>
 
@@ -23,16 +23,7 @@ input { border: 1px solid #aaa; padding: 2px; }
     font-family: Consolas, Courier, "Courier New", Gadugi, Arial;
 }
 
-#time_to_frames_info {
-    position:    absolute;
-    float:       right;
-    bottom:      0;
-    right:       0;
-    padding:     0px 5px;
-    font-family: Calibri, Arial;
-}
-
-.box {
+.boxes {
     position:    relative;
     border:      1px solid black;
     width:       755px;
@@ -43,16 +34,16 @@ input { border: 1px solid #aaa; padding: 2px; }
     font-size:   large;
 }
 
-.box2 { height: 345px; }
+.upper_box { height: 345px; }
 
 </style>
 
 <br>
 
-<div class="box box2">
+<div class="boxes upper_box">
     <strong>Frames to Time</strong> <br><br>
-      <input id="frames_f2t" type="text" pattern="[0-9]+([,/ ][0-9]+)?" title="e.g. 45000 / 45,000 / 45 000" min="0" max="99999999" maxlength="18" onkeydown="if (event.keyCode == 13) frames_to_time()"/> frames <br><br>
-      <input id="fps_f2t" type="text" pattern="[0-9]+([,/.][0-9]+)?" title="e.g. 60 / 59.5 / 30,2" min="0.001" max="10000" maxlength="18" onkeydown="if (event.keyCode == 13) frames_to_time()"/> fps <br><br><br>
+      <input id="frames_f2t" type="text" pattern="[0-9]+([,/./ ][0-9]+)?" title="e.g. 45000 / 45,000 / 45 000" min="0" max="99999999" maxlength="18" onkeydown="if (event.keyCode == 13) frames_to_time()"/> frames <br><br>
+      <input id="fps_f2t" type="text" pattern="[0-9]+([,/.][0-9]+)?" title="e.g. 60 / 59.5 / 23,976" min="0.001" max="10000" maxlength="18" onkeydown="if (event.keyCode == 13) frames_to_time()"/> fps <br><br><br>
       <input type="radio" name="accuracy" id="10"> Tenths <input type="radio" name="accuracy" id="100"> Hundredths <input type="radio" name="accuracy" id="1000" checked="checked"> Thousandths <br><br>
 	  <input type="checkbox" id="truncate"> Truncate <br><br><br>
 	<button onclick="frames_to_time()">Get Time</button>
@@ -61,13 +52,13 @@ input { border: 1px solid #aaa; padding: 2px; }
 
 <br>
 
-<div class="box">
+<div class="boxes">
     <strong>Time to Frames &nbsp; (approx.)</strong> <p>use the most accurate time available for max. precision</p> <br>
       <input id="hours_t2f" type="text" pattern="[0-9]*" title="optional" min="0" max="99999" maxlength="5" size="5" onkeydown="if (event.keyCode == 13) time_to_frames()"/> h &nbsp;
       <input id="minutes_t2f" type="text" pattern="[0-9]*" min="0" max="59" maxlength="2" size="5" onkeydown="if (event.keyCode == 13) time_to_frames()"/> m &nbsp;
       <input id="seconds_t2f" type="text" pattern="[0-9]*" min="0" max="59" maxlength="2" size="5" onkeydown="if (event.keyCode == 13) time_to_frames()"/> s &nbsp;
       <input id="milliseconds_t2f" type="text" pattern="[0-9]*" min="0" max="999" maxlength="3" size="5" onkeydown="if (event.keyCode == 13) time_to_frames()"/> ms <br><br>
-      <input id="fps_t2f" type="text" pattern="[0-9]+([,/.][0-9]+)?" title="e.g. 60 / 59.5 / 30,2" min="0.001" max="10000" maxlength="18" size="5" onkeydown="if (event.keyCode == 13) time_to_frames()"/> fps <br><br>
+      <input id="fps_t2f" type="text" pattern="[0-9]+([,/.][0-9]+)?" title="e.g. 60 / 59.5 / 23,976" min="0.001" max="10000" maxlength="18" size="5" onkeydown="if (event.keyCode == 13) time_to_frames()"/> fps <br><br>
     <button onclick="time_to_frames()">Get Frames</button>
     <h2 id="time_to_frames_output"></h2> <p id="time_to_frames_extra"></p>
 </div>
@@ -78,25 +69,24 @@ input { border: 1px solid #aaa; padding: 2px; }
 
 // I found the 'precise_round' function from here: https://www.w3resource.com/javascript-exercises/javascript-math-exercise-14.php and 'countDecimals' here: https://stackoverflow.com/a/17369384
 
-function precise_round(num, dec){
+function precise_round(num, dec) {
  
-  if ((typeof num !== 'number') || (typeof dec !== 'number'))
-return false;
+  if (typeof num !== 'number' || typeof dec !== 'number') { return false; }
 
   var num_sign = num >= 0 ? 1 : -1;
 
-  return (Math.round((num*Math.pow(10,dec))+(num_sign*0.0000000000000001))/Math.pow(10,dec)).toFixed(dec);
+  return (Math.round((num * Math.pow(10, dec)) + (num_sign * 0.0000000000000001)) / Math.pow(10, dec)).toFixed(dec);
 }
 
 var countDecimals = function (value) {
     if ((value % 1) != 0)
-        return value.toString().split(".")[1].length;
+        return value.toString().split('.')[1].length;
     return 0;
 };
 
 function frames_to_time() {
 
-if (countDecimals(document.getElementById('frames_f2t').value.replace(/[ ,]/g, '')) > 0 || countDecimals(document.getElementById('fps_f2t').value.replace(',', '.')) > 12) { return; }
+if (countDecimals(document.getElementById('frames_f2t').value.replace(/[ ,.]/g, '')) > 0 || countDecimals(document.getElementById('fps_f2t').value.replace(',', '.')) > 12) { return; }
 
 if (document.getElementById('10').checked)   { var accuracy = 1; }
 if (document.getElementById('100').checked)  { var accuracy = 2; }
@@ -107,39 +97,39 @@ if (document.getElementById('1000').checked) { var accuracy = 3; }
     var fps         = document.getElementById('fps_f2t').value;
     var fps_trim    = fps.replace(',', '.');
 
-if (fps_trim >= 0.001 && fps_trim <= 10000 && frames_trim >= 0 && frames_trim <= 99999999) {
+if (fps_trim >= 0.001 && fps_trim <= 10000 && frames_trim >= 0 && frames_trim <= 99999999) { var frames_to_seconds_long = precise_round(frames_trim / fps_trim, 12).toString(); } else { return; }
 
-    var frames_to_seconds_long  = precise_round(frames_trim / fps_trim, 12).toString();
-    var frames_to_seconds_final = precise_round(frames_trim / fps_trim, accuracy).toString();
-    var date = new Date(frames_trim / fps_trim * 1000);
-    var hh   = Math.floor(frames_trim / fps_trim / 3600);
+if (truncate.checked && accuracy == 1) { var frames_to_seconds_final = (frames_trim / fps_trim).toString(); } else { var frames_to_seconds_final = precise_round(frames_trim / fps_trim, accuracy).toString(); }
+
+    var hh = Math.floor(frames_to_seconds_final / 3600);
+    var ss_remainder = frames_to_seconds_final - (hh * 3600);
+    var mm = Math.floor(ss_remainder / 60);
+
+if (truncate.checked && accuracy == 1) { var ss_ms = ss_remainder - (mm * 60); } else { var ss_ms = precise_round(ss_remainder - (mm * 60), accuracy); }
+
+    var ss = ss_ms.toString().split('.')[0];
+    var ms = ss_ms.toString().split('.')[1];
     var hh_b = '';
-    var mm   = date.getUTCMinutes();
     var mm_b = mm;
-    var ss   = date.getSeconds();
-    var ms   = frames_to_seconds_final.substr(frames_to_seconds_final.indexOf('.') + 1, accuracy);
     var ms_b = ms;
-}
 
-else { return; }
-
-if (truncate.checked == true) { var ms = frames_to_seconds_long.substr(frames_to_seconds_long.indexOf('.') + 1, accuracy).toString(); var ms_b = ms; }
+if (truncate.checked && ms != 0) { var ms_b = frames_to_seconds_long.substr(frames_to_seconds_long.indexOf('.') + 1, accuracy).toString(); var ms = ms_b; }
 
 if (hh > 0)              { var hh_b = hh + ':'; var hh = hh + 'h '; }
 if (mm < 10)             { var mm_b = '0' + mm;  }
 if (mm < 10 && hh != '') { var mm_b = '0' + mm; var mm = '0' + mm;  }
 if (ss < 10)             { var ss   = '0' + ss;  }
-if (accuracy == 2)       { var ms_b = ms + '0';  }
-if (accuracy == 1)       { var ms_b = ms + '00'; }
+if (accuracy == 2)       { var ms = ms_b + '0';  }
+if (accuracy == 1)       { var ms = ms_b + '00'; }
 
-    var final_time_output_extended = hh + mm + 'm ' + ss + 's ' + ms_b + 'ms';
-    var final_time_output_basic    = hh_b + mm_b + ':' + ss + '.' + ms;
+    var final_time_output_extended = hh + mm + 'm ' + ss + 's ' + ms + 'ms';
+    var final_time_output_basic    = hh_b + mm_b + ':' + ss + '.' + ms_b;
 
     document.getElementById('frames_f2t').value = frames_trim;
     document.getElementById('fps_f2t').value = fps_trim;
 
     document.getElementById('frames_to_time_output').innerHTML = final_time_output_extended + '\xa0 (' + final_time_output_basic + ')';
-    document.getElementById('frames_to_time_extra').innerHTML = frames_to_seconds_long + 's' + ' -> ' + frames_to_seconds_final.substr(0, frames_to_seconds_final.indexOf('.')) + '.' + ms + 's';
+    document.getElementById('frames_to_time_extra').innerHTML = frames_to_seconds_long + 's' + ' -> ' + frames_to_seconds_final.toString().split('.')[0] + '.' + ms_b + 's';
 }
 
 function time_to_frames() {
